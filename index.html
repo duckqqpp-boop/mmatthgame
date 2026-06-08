@@ -1,0 +1,40 @@
+<div class="game" id="gameWindow">
+
+  <div class="start-screen" id="startScreen">
+    <h1>⚠️ SYSTEM OVERLOAD</h1>
+    <p style="color: #666688;">제한시간 엄수. 오답은 자폭 메커니즘을 가속합니다.</p>
+    
+    <div class="diff-buttons">
+      <button class="btn-easy" onclick="startGame(10)">EASY PROTOCOL (0-10)</button>
+      <button class="btn-normal" onclick="startGame(20)">NORMAL PROTOCOL (0-20)</button>
+      <button class="btn-hard" onclick="startGame(50)">HARD PROTOCOL (0-50)</button>
+    </div>
+  </div>
+
+  <div class="play-screen hidden" id="playScreen">
+    <div class="top">
+      <div class="timer" id="timerBox">🚨 DETONATION: <span id="time">60</span>s</div>
+      <div class="score">CORE: <span id="score">0</span></div>
+    </div>
+
+    <div class="question" id="question">-- + --</div>
+
+    <div class="choices" id="choices"></div>
+
+    <div class="bottom">
+      <div class="combo">🔥 MULTIPLIER x<span id="combo">0</span></div>
+      <div id="feedback"></div>
+    </div>
+  </div>
+
+  <div class="end-screen hidden" id="endScreen">
+    <h2>💥 TIME OVER: DETONATED</h2>
+    <div class="stats">
+      <p>연산 스코어: <span id="finalScore" style="color: #ffcc00; font-weight:bold;">0</span></p>
+      <p>처리한 연산: <span id="totalQuestions">0</span>개</p>
+      <p>연산 정확도: <span id="accuracy" style="color: #00ff66; font-weight:bold;">0%</span></p>
+    </div>
+    <button class="big-btn" onclick="resetGame()">시스템 재부팅</button>
+  </div>
+
+</div>
