@@ -1,0 +1,201 @@
+/* 애니메이션 마스터 */
+@keyframes shake-intense {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  10% { transform: translate(-8px, -5px) rotate(-2deg); }
+  30% { transform: translate(10px, 4px) rotate(3deg); }
+  50% { transform: translate(-10px, 8px) rotate(-1deg); }
+  70% { transform: translate(8px, -4px) rotate(2deg); }
+  90% { transform: translate(-5px, 2px) rotate(-1deg); }
+}
+
+@keyframes explosion-flash {
+  0% { background: #ffffff; filter: invert(0); }
+  20% { background: #ff0033; filter: invert(1); }
+  40% { background: #000000; }
+  100% { background: #020208; }
+}
+
+@keyframes panic-pulse {
+  0%, 100% { border-color: #ff0055; box-shadow: 0 0 15px #ff0055; }
+  50% { border-color: #ffffff; box-shadow: 0 0 35px #ff0000, inset 0 0 20px #ff0000; }
+}
+
+@keyframes text-glitch {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.3); text-shadow: -3px 0 #00ffff, 3px 0 #ff0055; }
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: radial-gradient(circle at center, #0a0a16, #020208);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+  transition: background 0.1s;
+}
+
+/* 폭발했을 때 화면 연출 */
+body.detonated {
+  animation: explosion-flash 0.8s ease-out forwards, shake-intense 0.6s ease-in-out;
+}
+
+body.screen-shake {
+  animation: shake-intense 0.25s infinite;
+  background: #300505;
+}
+
+.game {
+  width: 380px;
+  padding: 30px;
+  border-radius: 24px;
+  background: #0d0d14;
+  border: 2px solid #00ffcc;
+  box-shadow: 0 0 20px rgba(0,255,23a,0.15);
+  transition: all 0.1s;
+}
+
+/* 10초 이하일 때 게임 창 전체가 터지기 직전 상태로 변함 */
+.game.panic {
+  animation: panic-pulse 0.3s infinite;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.timer {
+  font-size: 24px;
+  font-weight: 900;
+  color: #00ffcc;
+  text-shadow: 0 0 10px rgba(0,255,200,0.5);
+}
+
+.timer.emergency {
+  color: #ff0055;
+  animation: text-glitch 0.2s infinite;
+}
+
+.score {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffcc00;
+}
+
+.question {
+  text-align: center;
+  font-size: 46px;
+  margin: 35px 0;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-shadow: 0 0 15px rgba(255,255,255,0.2);
+}
+
+.choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+button {
+  padding: 18px;
+  font-size: 20px;
+  font-weight: bold;
+  border: 1px solid #22223b;
+  border-radius: 14px;
+  background: #141424;
+  color: #d1d1e6;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+button:hover {
+  background: #1d1d33;
+  border-color: #00ffcc;
+  box-shadow: 0 0 15px rgba(0,255,233,0.4);
+}
+
+button.correct {
+  background: #00ff66 !important;
+  color: black !important;
+  box-shadow: 0 0 30px #00ff66 !important;
+}
+
+button.wrong {
+  background: #ff0055 !important;
+  color: white !important;
+  box-shadow: 0 0 30px #ff0055 !important;
+}
+
+.bottom {
+  margin-top: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 30px;
+}
+
+.combo {
+  color: #ff00a0;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+#feedback {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* 대기 및 종료 창 */
+.start-screen h1 {
+  font-size: 40px;
+  color: #ff0055;
+  text-shadow: 0 0 20px #ff0055;
+  letter-spacing: 3px;
+}
+
+.diff-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.diff-buttons button {
+  border-left: 5px solid;
+}
+.btn-easy { border-color: #00ff66; }
+.btn-normal { border-color: #ffcc00; }
+.btn-hard { border-color: #ff0055; }
+
+.end-screen h2 {
+  color: #ff3333;
+  font-size: 36px;
+  text-shadow: 0 0 15px #ff0000;
+}
+.stats {
+  background: #090912;
+  padding: 15px;
+  border-radius: 12px;
+  margin: 20px 0;
+  border: 1px solid #ff0055;
+}
+
+.big-btn {
+  width: 100%;
+  background: #ff0055;
+  color: white;
+  border: none;
+}
+.big-btn:hover {
+  background: #ff3377;
+  box-shadow: 0 0 20px #ff0055;
+}
+
+.hidden { display: none !important; }
