@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -24,4 +25,438 @@
 
 @keyframes panic-pulse {
   0%, 100% { border-color: #ff0055; box-shadow: 0 0 15px #ff0055; }
-  50% { border-color: #ffffff; box-shadow: 0 0 35px #ff
+  50% { border-color: #ffffff; box-shadow: 0 0 35px #ff0000, inset 0 0 20px #ff0000; }
+}
+
+@keyframes text-glitch {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.3); text-shadow: -3px 0 #00ffff, 3px 0 #ff0055; }
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: radial-gradient(circle at center, #0a0a16, #020208);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+  transition: background 0.1s;
+}
+
+body.detonated {
+  animation: explosion-flash 0.8s ease-out forwards, shake-intense 0.6s ease-in-out;
+}
+
+body.screen-shake {
+  animation: shake-intense 0.25s infinite;
+  background: #300505;
+}
+
+.game {
+  width: 380px;
+  padding: 30px;
+  border-radius: 24px;
+  background: #0d0d14;
+  border: 2px solid #00ffcc;
+  box-shadow: 0 0 20px rgba(0,255,23a,0.15);
+  transition: all 0.1s;
+}
+
+.game.panic {
+  animation: panic-pulse 0.3s infinite;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.timer {
+  font-size: 24px;
+  font-weight: 900;
+  color: #00ffcc;
+  text-shadow: 0 0 10px rgba(0,255,200,0.5);
+}
+
+.timer.emergency {
+  color: #ff0055;
+  animation: text-glitch 0.2s infinite;
+}
+
+.score {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffcc00;
+}
+
+.question {
+  text-align: center;
+  font-size: 46px;
+  margin: 35px 0;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-shadow: 0 0 15px rgba(255,255,255,0.2);
+}
+
+.choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+button {
+  padding: 18px;
+  font-size: 20px;
+  font-weight: bold;
+  border: 1px solid #22223b;
+  border-radius: 14px;
+  background: #141424;
+  color: #d1d1e6;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+button:hover {
+  background: #1d1d33;
+  border-color: #00ffcc;
+  box-shadow: 0 0 15px rgba(0,255,233,0.4);
+}
+
+button.correct {
+  background: #00ff66 !important;
+  color: black !important;
+  box-shadow: 0 0 30px #00ff66 !important;
+}
+
+button.wrong {
+  background: #ff0055 !important;
+  color: white !important;
+  box-shadow: 0 0 30px #ff0055 !important;
+}
+
+.bottom {
+  margin-top: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 30px;
+}
+
+.combo {
+  color: #ff00a0;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+#feedback {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.start-screen h1 {
+  font-size: 40px;
+  color: #ff0055;
+  text-shadow: 0 0 20px #ff0055;
+  letter-spacing: 3px;
+}
+
+.diff-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.diff-buttons button {
+  border-left: 5px solid;
+}
+.btn-easy { border-color: #00ff66; }
+.btn-normal { border-color: #ffcc00; }
+.btn-hard { border-color: #ff0055; }
+
+.end-screen h2 {
+  color: #ff3333;
+  font-size: 36px;
+  text-shadow: 0 0 15px #ff0000;
+}
+.stats {
+  background: #090912;
+  padding: 15px;
+  border-radius: 12px;
+  margin: 20px 0;
+  border: 1px solid #ff0055;
+}
+
+.big-btn {
+  width: 100%;
+  background: #ff0055;
+  color: white;
+  border: none;
+}
+.big-btn:hover {
+  background: #ff3377;
+  box-shadow: 0 0 20px #ff0055;
+}
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="game" id="gameWindow">
+
+  <div class="start-screen" id="startScreen">
+    <h1>⚠️ SYSTEM OVERLOAD</h1>
+    <p style="color: #666688;">제한시간 엄수. 오답은 자폭 메커니즘을 가속합니다.</p>
+    
+    <div class="diff-buttons">
+      <button class="btn-easy" onclick="startGame(10)">EASY PROTOCOL (0-10)</button>
+      <button class="btn-normal" onclick="startGame(20)">NORMAL PROTOCOL (0-20)</button>
+      <button class="btn-hard" onclick="startGame(50)">HARD PROTOCOL (0-50)</button>
+    </div>
+  </div>
+
+  <div class="play-screen hidden" id="playScreen">
+    <div class="top">
+      <div class="timer" id="timerBox">🚨 DETONATION: <span id="time">60</span>s</div>
+      <div class="score">CORE: <span id="score">0</span></div>
+    </div>
+
+    <div class="question" id="question">-- + --</div>
+
+    <div class="choices" id="choices"></div>
+
+    <div class="bottom">
+      <div class="combo">🔥 MULTIPLIER x<span id="combo">0</span></div>
+      <div id="feedback"></div>
+    </div>
+  </div>
+
+  <div class="end-screen hidden" id="endScreen">
+    <h2>💥 TIME OVER: DETONATED</h2>
+    <div class="stats">
+      <p>연산 스코어: <span id="finalScore" style="color: #ffcc00; font-weight:bold;">0</span></p>
+      <p>처리한 연산: <span id="totalQuestions">0</span>개</p>
+      <p>연산 정확도: <span id="accuracy" style="color: #00ff66; font-weight:bold;">0%</span></p>
+    </div>
+    <button class="big-btn" onclick="resetGame()">시스템 재부팅</button>
+  </div>
+
+</div>
+
+<script>
+var score = 0;
+var time = 60;
+var combo = 0;
+var correctAnswer;
+var timer = null;
+var maxNumber = 10;
+
+var totalSolved = 0;
+var correctCount = 0;
+var isClickable = true;
+
+var audioCtx = null;
+
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}
+
+function playSound(type, customFreq) {
+  try {
+    initAudio();
+    if (!audioCtx) return;
+
+    var osc = audioCtx.createOscillator();
+    var gainNode = audioCtx.createGain();
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    var now = audioCtx.currentTime;
+
+    if (type === 'click') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(550, now);
+      gainNode.gain.setValueAtTime(0.15, now);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
+      osc.start(now);
+      osc.stop(now + 0.04);
+    } 
+    else if (type === 'warning') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(customFreq || 800, now);
+      gainNode.gain.setValueAtTime(0.2, now);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+      osc.start(now);
+      osc.stop(now + 0.08);
+    } 
+    else if (type === 'boom') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(180, now);
+      osc.frequency.exponentialRampToValueAtTime(10, now + 0.8);
+      gainNode.gain.setValueAtTime(0.6, now);
+      gainNode.gain.linearRampToValueAtTime(0.01, now + 0.8);
+      osc.start(now);
+      osc.stop(now + 0.8);
+    }
+  } catch (e) {
+    console.log("Audio Error:", e);
+  }
+}
+
+function startGame(levelMax) {
+  initAudio();
+  maxNumber = levelMax;
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('playScreen').classList.remove('hidden');
+  
+  nextQuestion();
+  if (timer) clearInterval(timer);
+  
+  timer = setInterval(function() {
+    time--;
+    document.getElementById('time').textContent = time;
+    
+    if (time <= 10 && time > 0) {
+      document.getElementById('gameWindow').classList.add('panic');
+      document.getElementById('timerBox').classList.add('emergency');
+      var emergencyFreq = 800 + ((10 - time) * 80); 
+      playSound('warning', emergencyFreq);
+    }
+    
+    if (time <= 0) {
+      clearInterval(timer);
+      handleExplosion();
+    }
+  }, 1000);
+}
+
+function nextQuestion() {
+  isClickable = true;
+  var a = Math.floor(Math.random() * (maxNumber + 1));
+  var b = Math.floor(Math.random() * (maxNumber + 1));
+  var ops = ['+', '-', '*'];
+  var op = ops[Math.floor(Math.random() * ops.length)];
+
+  if (op === '-' && a < b) { var temp = a; a = b; b = temp; }
+
+  if (op === '+') correctAnswer = a + b;
+  if (op === '-') correctAnswer = a - b;
+  if (op === '*') correctAnswer = a * b;
+
+  document.getElementById('question').textContent = a + " " + op + " " + b;
+
+  var answers = [correctAnswer];
+  while (answers.length < 4) {
+    var range = maxNumber > 10 ? 15 : 5;
+    var wrong = correctAnswer + Math.floor(Math.random() * (range * 2) - range);
+    if (answers.indexOf(wrong) === -1 && wrong >= 0) {
+      answers.push(wrong);
+    }
+  }
+
+  answers.sort(function() { return Math.random() - 0.5; });
+
+  var choicesDiv = document.getElementById('choices');
+  choicesDiv.innerHTML = '';
+
+  answers.forEach(function(ans) {
+    var btn = document.createElement('button');
+    btn.textContent = ans;
+    btn.onclick = function() { checkAnswer(btn, ans); };
+    choicesDiv.appendChild(btn);
+  });
+}
+
+function checkAnswer(button, answer) {
+  if (!isClickable) return;
+  isClickable = false;
+  
+  playSound('click');
+  totalSolved++;
+  var feedback = document.getElementById('feedback');
+
+  if (answer === correctAnswer) {
+    correctCount++;
+    score += 10 + combo * 2;
+    combo++;
+    button.classList.add('correct');
+    feedback.textContent = '⚡ SECURE';
+    feedback.style.color = '#00ff66';
+  } else {
+    combo = 0;
+    time = Math.max(0, time - 4); 
+    document.getElementById('time').textContent = time;
+    button.classList.add('wrong');
+    document.body.classList.add('screen-shake');
+    feedback.textContent = '🚨 OVERLOAD -4s';
+    feedback.style.color = '#ff0055';
+    
+    if (time <= 0) {
+      clearInterval(timer);
+      handleExplosion();
+      return;
+    }
+  }
+
+  document.getElementById('score').textContent = score;
+  document.getElementById('combo').textContent = combo;
+
+  setTimeout(function() {
+    document.body.classList.remove('screen-shake');
+    feedback.textContent = '';
+    if (time > 0) nextQuestion();
+  }, 350);
+}
+
+function handleExplosion() {
+  document.body.classList.remove('screen-shake');
+  document.body.classList.add('detonated'); 
+  playSound('boom');
+
+  setTimeout(function() {
+    document.getElementById('gameWindow').classList.remove('panic');
+    document.getElementById('playScreen').classList.add('hidden');
+    document.getElementById('endScreen').classList.remove('hidden');
+    
+    var accuracyPercent = totalSolved > 0 ? Math.round((correctCount / totalSolved) * 100) : 0;
+    document.getElementById('finalScore').textContent = score;
+    document.getElementById('totalQuestions').textContent = totalSolved;
+    document.getElementById('accuracy').textContent = accuracyPercent + '%';
+  }, 600);
+}
+
+function resetGame() {
+  score = 0;
+  time = 60;
+  combo = 0;
+  totalSolved = 0;
+  correctCount = 0;
+  isClickable = true;
+  
+  document.getElementById('score').textContent = score;
+  document.getElementById('combo').textContent = combo;
+  document.getElementById('time').textContent = time;
+  document.getElementById('feedback').textContent = '';
+  
+  document.body.classList.remove('detonated', 'screen-shake');
+  document.getElementById('gameWindow').classList.remove('panic');
+  document.getElementById('timerBox').classList.remove('emergency');
+  
+  document.getElementById('endScreen').classList.add('hidden');
+  document.getElementById('startScreen').classList.remove('hidden');
+}
+</script>
+</body>
+</html>
+
